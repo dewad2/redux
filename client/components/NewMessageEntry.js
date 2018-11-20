@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
-import store, { writeMessage, gotNewMessageFromServer } from '../store';
+import store, { createMessage, writeMessage } from '../store';
 import axios from 'axios';
+import socket from '../socket';
 
 export default class NewMessageEntry extends Component {
   constructor() {
@@ -21,21 +22,11 @@ export default class NewMessageEntry extends Component {
   }
   handleSubmit(evt) {
     evt.preventDefault();
-    const content = this.state.NewMessageEntry;
+    const content = this.state.newMessageEntry;
     const channelId = this.props.channelId;
-    /* const { data } = await axios.post('/api/messages', {
-      content: content,
-      channelId: channelId
-    });
-    const action = gotNewMessageFromServer(data);
-    store.dispatch(action); */
-    axios
-      .post('/api/messages', { content, channelId })
-      .then(res => res.data)
-      .then(message => store.dispatch(gotNewMessageFromServer(message)))
-      .catch(error => {
-        console.log(error);
-      });
+    const name = this.state.newNameEntry;
+    const thunk = createMessage({ content, channelId, name });
+    store.dispatch(thunk);
   }
   render() {
     console.log('store', this.state);
